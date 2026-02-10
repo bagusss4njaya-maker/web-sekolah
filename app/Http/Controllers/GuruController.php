@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $teacherId = Auth::id();
+        $q = $request->input('q');
 
         // Counts
         $totalStudents = User::where('role', 'siswa')->count(); // For now, global count
@@ -39,8 +40,19 @@ class GuruController extends Controller
             ->take(5)
             ->get();
             
-        // All students (limit for dashboard view)
-        $students = User::where('role', 'siswa')->take(5)->get();
+        $studentsQuery = User::where('role', 'siswa');
+        if ($q) {
+            $studentsQuery->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('username', 'like', "%{$q}%")
+                    ->orWhere('nis', 'like', "%{$q}%")
+                    ->orWhere('major', 'like', "%{$q}%");
+            });
+        }
+        $students = $q
+            ? $studentsQuery->latest()->paginate(10)->appends(['q' => $q])
+            : $studentsQuery->latest()->take(5)->get();
 
         return view('guru.dashboard', compact(
             'totalStudents',
@@ -49,7 +61,8 @@ class GuruController extends Controller
             'schedules',
             'subjects',
             'recentGrades',
-            'students'
+            'students',
+            'q'
         ));
     }
 }

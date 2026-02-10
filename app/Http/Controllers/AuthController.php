@@ -18,16 +18,32 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'username' => ['required', 'string'],
+            'email' => ['nullable', 'string', 'email'],
+            'username' => ['nullable', 'string'],
             'password' => ['required'],
         ]);
 
-        $username = trim($request->input('username'));
+        // At least one identifier must be provided
+        if (!$request->filled('email') && !$request->filled('username')) {
+            throw ValidationException::withMessages([
+                'email' => 'Email atau Username wajib diisi.',
+                'username' => 'Email atau Username wajib diisi.',
+            ]);
+        }
+
+        $email = $request->input('email') ? trim($request->input('email')) : null;
+        $username = $request->input('username') ? trim($request->input('username')) : null;
         $password = $request->input('password');
         $roleTarget = $request->input('role_target', 'user'); // 'admin' atau 'user'
 
-        // Find user by Username
-        $user = User::where('username', $username)->first();
+        // Find user by Email first, fallback to Username
+        $user = null;
+        if ($email) {
+            $user = User::where('email', $email)->first();
+        }
+        if (!$user && $username) {
+            $user = User::where('username', $username)->first();
+        }
 
         if ($user && Hash::check($password, $user->password)) {
             // Pisahkan login berdasarkan tombol yang dipilih

@@ -12,10 +12,23 @@ use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $students = User::where('role', 'siswa')->with('schoolClass')->latest()->paginate(10);
-        return view('admin.students.index', compact('students'));
+        $q = $request->input('q');
+        $query = User::where('role', 'siswa')->with('schoolClass');
+        if ($q) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('username', 'like', "%{$q}%")
+                    ->orWhere('nis', 'like', "%{$q}%")
+                    ->orWhereHas('schoolClass', function ($sc) use ($q) {
+                        $sc->where('name', 'like', "%{$q}%");
+                    });
+            });
+        }
+        $students = $query->latest()->paginate(10)->appends(['q' => $q]);
+        return view('admin.students.index', compact('students', 'q'));
     }
 
     public function create()
@@ -28,6 +41,7 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
             'username' => 'required|string|max:255|unique:users',
             'password' => 'nullable|string|min:8',
             'nis' => 'required|string|unique:users',
@@ -63,6 +77,7 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($student->id)],
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($student->id)],
             'nis' => ['required', 'string', Rule::unique('users')->ignore($student->id)],
             'major' => 'required|string',

@@ -11,10 +11,20 @@ use Illuminate\Validation\Rule;
 
 class TeacherController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $teachers = User::where('role', 'guru')->latest()->paginate(10);
-        return view('admin.teachers.index', compact('teachers'));
+        $q = $request->input('q');
+        $query = User::where('role', 'guru');
+        if ($q) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('username', 'like', "%{$q}%")
+                    ->orWhere('nip', 'like', "%{$q}%");
+            });
+        }
+        $teachers = $query->latest()->paginate(10)->appends(['q' => $q]);
+        return view('admin.teachers.index', compact('teachers', 'q'));
     }
 
     public function create()

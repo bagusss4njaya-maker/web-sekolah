@@ -18,8 +18,12 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+                <input class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent" id="email" type="email" name="email" value="{{ old('email') }}" placeholder="Masukkan Email (opsional)">
+            </div>
+            <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
-                <input class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent" id="username" type="text" name="username" value="{{ old('username') }}" required autofocus placeholder="Masukkan Username">
+                <input class="shadow-sm border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent" id="username" type="text" name="username" value="{{ old('username') }}" autofocus placeholder="Masukkan Username (opsional)">
             </div>
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
@@ -36,11 +40,11 @@
         </form>
         
         <div class="mt-4 text-sm text-gray-600">
-            <p class="font-semibold">Demo Accounts (Username / Password):</p>
+            <p class="font-semibold">Demo Accounts (Email atau Username / Password):</p>
             <ul class="list-disc ml-5 mt-1">
-                <li>Admin: admin / password</li>
-                <li>Guru: guru / password</li>
-                <li>Siswa: siswa / password</li>
+                <li>Admin: admin@school.com atau admin / password</li>
+                <li>Guru: guru@school.com atau guru / password</li>
+                <li>Siswa: siswa@school.com atau siswa / password</li>
             </ul>
         </div>
     </div>

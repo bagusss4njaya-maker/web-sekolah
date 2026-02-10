@@ -51,6 +51,45 @@
     </div>
 </div>
 
+<div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-lg font-bold text-gray-800">Cari Siswa</h3>
+        <form method="GET" action="{{ route('guru.dashboard') }}" class="flex items-center">
+            <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Cari nama, email, username, NIS" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button type="submit" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2 rounded">Cari</button>
+        </form>
+    </div>
+    <div class="p-6">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-500 border-b border-gray-100">
+                        <th class="pb-3 font-medium">Nama</th>
+                        <th class="pb-3 font-medium">Email</th>
+                        <th class="pb-3 font-medium">NIS</th>
+                        <th class="pb-3 font-medium">Kelas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($students as $student)
+                    <tr class="border-b border-gray-50 last:border-0">
+                        <td class="py-3 text-gray-800 font-medium">{{ $student->name }}</td>
+                        <td class="py-3 text-gray-600">{{ $student->email }}</td>
+                        <td class="py-3 text-gray-600">{{ $student->nis }}</td>
+                        <td class="py-3 text-gray-600">{{ $student->class_name ?? '-' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @if(isset($q) && $q)
+        <div class="mt-4">
+            {{ $students->links() }}
+        </div>
+        @endif
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <!-- Jadwal Pelajaran Table -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
